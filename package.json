@@ -1,0 +1,27 @@
+{
+  "name": "scm_service_2",
+  "version": "1.0.0",
+  "description": "Service for the SCM with Blockchain project for EIS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "server": "nodemon server"
+  },
+  "keywords": [
+    "Service",
+    "EIS",
+    "SCM"
+  ],
+  "author": "Joseledgy",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.10",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}
