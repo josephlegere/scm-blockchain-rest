@@ -6,6 +6,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 
 const machines = require('./routes/machines');
+const auth = require('./routes/auth');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -15,9 +16,10 @@ let app = express();
 
 app.use(express.json());
 
-app.options('/api/v1/machines', cors());
+app.options('/api/v1', cors());
 app.use(express.static('public')); // for public access, refer to this directory
 app.use('/api/v1/machines', machines);
+app.use('/api/v1/user', auth);
 
 //PORT ENVIRONMENT VARIABLE
 const port = process.env.PORT || 5000;

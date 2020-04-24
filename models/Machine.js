@@ -18,11 +18,7 @@ const MachineSchema = new mongoose.Schema({
             type: Number,
             required: true
         },
-        fname: {
-            type: String,
-            required: true
-        },
-        lname: {
+        name: {
             type: String,
             required: true
         }
