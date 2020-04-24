@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
+const verify = require('./verifyToken');
 const { getMachines, addMachine, deleteMachine } = require('../controllers/machines');
 
 router
     .route('/')
-    .get(cors(), getMachines)
+    .get(cors(), verify, getMachines)
     .post(cors(), addMachine);
 
 router
