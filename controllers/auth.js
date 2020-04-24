@@ -83,7 +83,7 @@ exports.loginUser = async (req, res) => {
     if (!user) {
         return res.status(400).json({
             success: false,
-            error: 'Email doesn\'t exists!'
+            error: 'Email doesn\'t exist!'
         });
     }
 

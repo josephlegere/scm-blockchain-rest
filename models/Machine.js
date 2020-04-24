@@ -32,6 +32,9 @@ const MachineSchema = new mongoose.Schema({
             required: true
         }
     },
+    parts: {
+        type: Array
+    },
     createdAt: {
         type: Date,
         default: Date.now //no required needed

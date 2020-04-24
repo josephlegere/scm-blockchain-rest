@@ -15,9 +15,8 @@ connectDB();
 let app = express();
 
 app.use(express.json());
-
-app.options('/api/v1', cors());
-app.use(express.static('public')); // for public access, refer to this directory
+app.use(cors());
+//app.use(express.static('public')); // for public access, refer to this directory
 app.use('/api/v1/machines', machines);
 app.use('/api/v1/user', auth);
 
