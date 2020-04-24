@@ -1,9 +1,10 @@
 const User = require('../models/User');
-const _ = require('lodash');
-const { registerValidation } = require('../utils/validation');
+const bcrypt = require('bcryptjs');
+
+const { registerValidation, loginValidation } = require('../utils/validation');
 
 //  @desc   Add user
-//  @route  POST /api/v1/users
+//  @route  POST /api/v1/users/register
 //  @access Public
 exports.registerUser = async (req, res) => {
 
@@ -25,11 +26,15 @@ exports.registerUser = async (req, res) => {
         });
     }
 
+    //Hash passwords
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(req.body.password, salt);
+
     //Create a new user
     const user = new User({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password
+        password: hashPassword
     });
 
     try {
@@ -37,7 +42,7 @@ exports.registerUser = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            data: savedUser
+            data: ({ user: user._id })
         });
     }
     catch (err) {
@@ -56,4 +61,39 @@ exports.registerUser = async (req, res) => {
             });
         }
     }
+}
+
+//  @desc   Login user
+//  @route  POST /api/v1/users/login
+//  @access Public
+exports.loginUser = async (req, res) => {
+
+    //  VALIDATE THE CREDENTIALS BEFORE LOGGING IN A USER
+    const { error } = loginValidation(req.body);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.details[0].message
+        });
+    }
+
+    //Checking if the user is registered
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return res.status(400).json({
+            success: false,
+            error: 'Email doesn\'t exists!'
+        });
+    }
+
+    //Check if Password is Correct
+    const validPass = await bcrypt.compare(req.body.password, user.password);
+    if (!validPass) {
+        return res.status(400).json({
+            success: false,
+            error: 'Invalid Password!'
+        });
+    }
+
+    res.send('Logged In');
 }
