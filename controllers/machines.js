@@ -1,6 +1,7 @@
 const Machine = require('../models/Machine');
 const { createXML } = require('../utils/xmlhandler');
 const _ = require('lodash');
+const Path = require('path');
 
 //  @desc   Get all machines
 //  @route  GET /api/v1/machines
@@ -34,7 +35,7 @@ exports.addMachine = async (req, res, next) => {
         let _record = _.cloneDeep(req.body);
         let _document = { machine: {} };
         let filename = `${Date.now()}_machine`;
-        let filesource = `uploads/${_record.customer.id}/`;
+        let filesource = `public/uploads/${_record.customer.id}/`;
         let _temp = _.cloneDeep(_record);
 
         _document.machine = Object.assign(_document.machine, _temp);
@@ -99,4 +100,14 @@ exports.deleteMachine = async (req, res, next) => {
             error: 'Server Error'
         });
     }
+}
+
+// @desc    Download machine
+// @route   DOWNLOAD /api/v1/machines/:id
+// @access  Public
+exports.downloadMachine = async (req, res, next) => {
+    console.log(req.params)
+    const path = Path.resolve(Path.dirname(__dirname), 'public/', 'uploads/', '1/1587664294406_machine.xml');
+    const file = `${path}`;
+    res.download(file); // Set disposition and send it.
 }

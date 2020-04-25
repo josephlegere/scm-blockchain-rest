@@ -13,14 +13,14 @@ exports.readXML = async (val) => {
 exports.createXML = async (val, name, source) => {
     const filename = `${name}.xml`;
     const filesource = `${source}`;
-    const path = Path.resolve(Path.dirname(__dirname), 'public/', filesource, filename);
+    const path = Path.resolve(Path.dirname(__dirname), filesource, filename);
     const jsonStr = JSON.stringify(val);
     const xml = parser.toXml(jsonStr);
     let _return = null;
     //console.log(xml);
     console.log(Path.dirname(__dirname))
 
-    let dir = `./public/${source}`;
+    let dir = `./${source}`;
 
     if (!fs.existsSync(dir)) {
         console.log(dir)
@@ -37,7 +37,7 @@ exports.createXML = async (val, name, source) => {
     });
 
     return {
-        source: `${filesource}${filename}`
+        source: `${filename}`
     };
 }
 

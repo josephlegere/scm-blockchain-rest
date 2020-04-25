@@ -32,7 +32,7 @@ const MachineSchema = new mongoose.Schema({
             required: true
         }
     },
-    parts: {
+    design: {
         type: Array
     },
     createdAt: {
