@@ -6,7 +6,7 @@ const { getMachines, addMachine, deleteMachine, downloadMachine } = require('../
 router
     .route('/')
     .get(verify, getMachines)
-    .post(addMachine);
+    .post(verify, addMachine);
 
 router
     .route('/:id')

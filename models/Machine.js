@@ -15,7 +15,7 @@ const MachineSchema = new mongoose.Schema({
     },
     customer: {
         id: {
-            type: Number,
+            type: mongoose.Types.ObjectId,
             required: true
         },
         name: {
@@ -33,7 +33,17 @@ const MachineSchema = new mongoose.Schema({
         }
     },
     design: {
+        design_item: {
+            type: String
+        }
+    },
+    parts: {
         type: Array
+    },
+    delivery: {
+        schedule: {
+            type: String
+        }
     },
     createdAt: {
         type: Date,

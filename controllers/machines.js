@@ -1,4 +1,5 @@
 const Machine = require('../models/Machine');
+const User = require('../models/User');
 const { createXML } = require('../utils/xmlhandler');
 const _ = require('lodash');
 const Path = require('path');
@@ -31,20 +32,29 @@ exports.addMachine = async (req, res, next) => {
 
     try {
         const { machine_item, quantity } = req.body;
+        const { _id, iat } = req.user;
+        const customer = await User.findOne({ _id: _id });
 
         let _record = _.cloneDeep(req.body);
         let _document = { machine: {} };
         let filename = `${Date.now()}_machine`;
-        let filesource = `public/uploads/${_record.customer.id}/`;
-        let _temp = _.cloneDeep(_record);
+        let filesource = `public/uploads/${_id}/`;
+        let _temp = {}; // temp sotring of records
+        let _document_info = {}; // stores the returned info of xml file
 
+        //building of xml file with the information
+        _record.customer = { name: customer.name };
+        _temp = _.cloneDeep(_record);
         _document.machine = Object.assign(_document.machine, _temp);
-        delete _document.machine.customer.id;
+        _document_info = await createXML(_document, filename, filesource);
 
-        let _document_info = await createXML(_document, filename, filesource);
-
+        //additional information for the machine(prototype) that is being built
         _record.document = _document_info;
-        //console.log(_record)
+        _record.customer.id = _id;
+        _record.design = {};
+        _record.parts = [];
+        _record.delivery = {};
+        console.log(_record)
 
         const machine = await Machine.create(_record);
         console.log('Machine Ordered!');
@@ -57,6 +67,7 @@ exports.addMachine = async (req, res, next) => {
     catch (err) {
         if (err.name === 'ValidationError') {
             const messages = Object.values(err.errors).map(val => val.message);
+            console.log(messages)
 
             return res.status(400).json({
                 success: false,
