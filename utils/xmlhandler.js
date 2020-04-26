@@ -11,35 +11,33 @@ exports.readXML = async (val) => {
 }
 
 exports.createXML = (val, name, source) => {
-    return new Promise((resolve, reject) => {
-        const filename = `${name}.xml`;
-        const filesource = `${source}`;
-        const path = Path.resolve(Path.dirname(__dirname), filesource, filename);
-        const jsonStr = JSON.stringify(val);
-        const filedata = parser.toXml(jsonStr);// XML Data
-        let _return = null;
-        //console.log(filedata);
+    const filename = `${name}.xml`;
+    const filesource = `${source}`;
+    const path = Path.resolve(Path.dirname(__dirname), filesource, filename);
+    const jsonStr = JSON.stringify(val);
+    const filedata = parser.toXml(jsonStr);// XML Data
+    let _return = null;
+    //console.log(filedata);
 
-        let dir = `./${source}`;// to create a directory that will store the file
-        if (!fs.existsSync(dir)) {
-            console.log(dir)
-            fs.mkdirSync(dir);
+    let dir = `./${source}`;// to create a directory that will store the file
+    if (!fs.existsSync(dir)) {
+        console.log(dir)
+        fs.mkdirSync(dir);
+    }
+
+    fs.writeFile(`${path}`, filedata, function (err, data) {
+        if (err) {
+            console.log(err);
         }
-
-        fs.writeFile(`${path}`, filedata, function (err, data) {
-            if (err) {
-                console.log(err);
-                reject(err);
-            }
-            else {
-                console.log('XML File created!');
-                resolve({
-                    source: `${filename}`,
-                    data: filedata
-                });
-            }
-        });
+        else {
+            console.log('XML File created!');
+        }
     });
+
+    return {
+        source: `${filename}`,
+        data: filedata
+    };
 }
 
 exports.writeXML = async (val) => {

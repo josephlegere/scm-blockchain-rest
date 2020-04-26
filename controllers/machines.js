@@ -51,7 +51,7 @@ exports.addMachine = async (req, res, next) => {
         _record.customer = { name: customer.name };
         _temp = _.cloneDeep(_record);
         _document.machine = Object.assign(_document.machine, _temp);
-        _document_info = await createXML(_document, filename, filesource);
+        _document_info = createXML(_document, filename, filesource);
 
         //additional information for the machine(prototype) that is being built
         _record.document = { source: _document_info.source };
@@ -68,7 +68,7 @@ exports.addMachine = async (req, res, next) => {
         chainCoin.addBlock(_document_info.data);
         console.log(chainCoin);
         console.log('Storing Blockchain.....');
-        _document_info = await createJSON(chainCoin, filename, filesource);
+        _document_info = createJSON(chainCoin, filename, filesource);
         console.log('Data Secured!');
 
         const machine = await Machine.create(_record);
