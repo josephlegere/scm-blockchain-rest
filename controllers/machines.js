@@ -1,6 +1,10 @@
 const Machine = require('../models/Machine');
 const User = require('../models/User');
+
 const { createXML } = require('../utils/xmlhandler');
+const { createJSON } = require('../utils/jsonhandler');
+const blockchain = require('../utils/blockchain');
+
 const _ = require('lodash');
 const Path = require('path');
 
@@ -39,8 +43,9 @@ exports.addMachine = async (req, res, next) => {
         let _document = { machine: {} };
         let filename = `${Date.now()}_machine`;
         let filesource = `public/uploads/${_id}/`;
-        let _temp = {}; // temp sotring of records
-        let _document_info = {}; // stores the returned info of xml file
+        let _temp = {};// temp sotring of records
+        let _document_info = {};// stores the returned info of xml file
+        let blockchain_container = [];// <-- THIS INITIALIZE THE BLOCKCHAIN
 
         //building of xml file with the information
         _record.customer = { name: customer.name };
@@ -49,12 +54,22 @@ exports.addMachine = async (req, res, next) => {
         _document_info = await createXML(_document, filename, filesource);
 
         //additional information for the machine(prototype) that is being built
-        _record.document = _document_info;
+        _record.document = { source: _document_info.source };
         _record.customer.id = _id;
         _record.design = {};
         _record.parts = [];
         _record.delivery = {};
         console.log(_record)
+
+        //secure data with blockchain
+        console.log('Securing Data.....');
+        let chainCoin = await new blockchain();
+        chainCoin.restructChain(blockchain_container);
+        chainCoin.addBlock(_document_info.data);
+        console.log(chainCoin);
+        console.log('Storing Blockchain.....');
+        _document_info = await createJSON(chainCoin, filename, filesource);
+        console.log('Data Secured!');
 
         const machine = await Machine.create(_record);
         console.log('Machine Ordered!');
@@ -114,11 +129,11 @@ exports.deleteMachine = async (req, res, next) => {
 }
 
 // @desc    Download machine
-// @route   DOWNLOAD /api/v1/machines/:id
+// @route   DOWNLOAD /api/v1/machines/download/:id
 // @access  Public
 exports.downloadMachine = async (req, res, next) => {
     console.log(req.params)
-    const path = Path.resolve(Path.dirname(__dirname), 'public/', 'uploads/', '1/1587664294406_machine.xml');
+    const path = Path.resolve(Path.dirname(__dirname), 'public/uploads/', '1/1587664294406_machine.xml');
     const file = `${path}`;
     res.download(file); // Set disposition and send it.
 }
