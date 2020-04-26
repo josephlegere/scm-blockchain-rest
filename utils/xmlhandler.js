@@ -3,10 +3,14 @@ const parser = require('xml2json');
 //const { create, convert } = require('xmlbuilder2');
 const Path = require('path');
 
-exports.readXML = async (val) => {
-    fs.readFile(val, function (err, data) {
-        let _xml = data;
-        var json = JSON.parse(parser.toJson(data, { reversible: true }));
+exports.readXML = (val) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(val, (err, data) => {
+            let _json = parser.toJson(data, { reversible: true });
+            _xml = parser.toXml(_json)
+            //console.log(_xml)
+            resolve(_xml);
+        });
     });
 }
 

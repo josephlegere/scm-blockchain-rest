@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const colors = require('colors');
 const morgan = require('morgan');
 const cors = require('cors');
+const Path = require('path');
 const connectDB = require('./config/db');
 
 const machines = require('./routes/machines');
@@ -16,7 +17,7 @@ let app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public')); // for public access, refer to this directory
+app.use('/public', express.static(Path.join(Path.dirname(__dirname), 'scm_service_2/public'))); // for public access, refer to this directory
 app.use('/api/v1/machines', machines);
 app.use('/api/v1/user', auth);
 

@@ -28,3 +28,13 @@ exports.createJSON = (val, name, source) => {
         data: filedata
     }
 }
+
+exports.readJSON = (val) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile(val, (err, data) => {
+            let _json = JSON.parse(data);
+            //console.log(_json)
+            resolve(_json);
+        });
+    });
+}

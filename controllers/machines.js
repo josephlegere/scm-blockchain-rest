@@ -1,8 +1,8 @@
 const Machine = require('../models/Machine');
 const User = require('../models/User');
 
-const { createXML } = require('../utils/xmlhandler');
-const { createJSON } = require('../utils/jsonhandler');
+const { createXML, readXML } = require('../utils/xmlhandler');
+const { createJSON, readJSON } = require('../utils/jsonhandler');
 const blockchain = require('../utils/blockchain');
 
 const _ = require('lodash');
@@ -133,7 +133,56 @@ exports.deleteMachine = async (req, res, next) => {
 // @access  Public
 exports.downloadMachine = async (req, res, next) => {
     console.log(req.params)
-    const path = Path.resolve(Path.dirname(__dirname), 'public/uploads/', '1/1587664294406_machine.xml');
-    const file = `${path}`;
-    res.download(file); // Set disposition and send it.
+    let { id, file } = req.params;
+    const path = Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file}`);
+    const filedata = `${path}`;
+    res.download(filedata); // Set disposition and send it.
+}
+
+// @desc    View machine
+// @route   VIEW /api/v1/machines/view/:id
+// @access  Public
+exports.viewMachine = async (req, res, next) => {
+    try {
+        // console.log(req.params)
+        let { id, file } = req.params;
+        let filedata = await readXML(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file}`));
+        let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file.split('.')[0]}.json`));
+        chain = chain.chain;
+        //console.log(filedata)
+        //console.log(chain)
+
+        //validate file before sending
+        let chainCoin = await new blockchain();
+        chainCoin.restructChain(chain);
+        let resultBlock = chainCoin.blockIsValid(filedata);
+        let resultChain = chainCoin.chainIsValid();
+
+        // console.log(resultBlock)
+        // console.log(resultChain)
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                chain: {
+                    result: resultChain,
+                    comment: (resultChain ? 'Chain is Valid.' : 'Chain has been tampered.')
+                },
+                document: {
+                    result: resultBlock,
+                    comment: (resultBlock ? 'Document is Valid.' : 'Document has been tampered.')
+                },
+                url: {
+                    data: (resultBlock && resultChain ? `http://localhost:5000/public/uploads/${id}/${file}` : null),
+                    comment: (resultBlock && resultChain ? 'Access Granted' : 'Unauthorized File, not accessible!')
+                }
+            }
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        });
+    }
 }

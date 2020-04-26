@@ -1,4 +1,5 @@
 const Block = require('./block')
+const _ = require('lodash');
 
 class BlockChain {
     constructor() {
@@ -33,15 +34,28 @@ class BlockChain {
 
     chainIsValid() {
         for (let i = 0; i < this.chain.length; i++) {
-            console.log(this.chain[i].hash)
-            console.log(this.chain[i].getHash())
-            console.log(this.chain[i].hash !== this.chain[i].getHash())
             if (this.chain[i].hash !== this.chain[i].getHash())
                 return false;
             if (i > 0 && this.chain[i].prevHash !== this.chain[i - 1].hash)
                 return false;
         }
         return true;
+    }
+
+    blockIsValid(data) {
+        let currentBlock = this.chain[this.chain.length - 1];
+        let blockData = JSON.parse(JSON.stringify(currentBlock));
+        let tempData = _.cloneDeep(blockData);
+        
+        //initializing temp data with the data from the file
+        tempData.data = (data).toString();
+        delete tempData.hash;
+
+        //structuring the block with the filedata
+        let tempBlock = this.restructBlock(tempData);
+        tempData = JSON.parse(JSON.stringify(tempBlock));
+
+        return blockData.hash === tempData.hash;
     }
 }
 

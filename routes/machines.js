@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const verify = require('./verifyToken');
-const { getMachines, addMachine, deleteMachine, downloadMachine } = require('../controllers/machines');
+const { getMachines, addMachine, deleteMachine, downloadMachine, viewMachine } = require('../controllers/machines');
 
 router
     .route('/')
@@ -13,7 +13,11 @@ router
     .delete(deleteMachine);
 
 router
-    .route('/download/:id')
+    .route('/download/:id/:file')
     .get(downloadMachine);
+
+router
+    .route('/view/:id/:file')
+    .get(viewMachine);
 
 module.exports = router;
