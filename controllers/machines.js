@@ -133,8 +133,8 @@ exports.deleteMachine = async (req, res, next) => {
 // @access  Public
 exports.downloadMachine = async (req, res, next) => {
     console.log(req.params)
-    let { id, file } = req.params;
-    const path = Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file}`);
+    let { id } = req.params;
+    const path = Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}`);
     const filedata = `${path}`;
     res.download(filedata); // Set disposition and send it.
 }
@@ -145,7 +145,10 @@ exports.downloadMachine = async (req, res, next) => {
 exports.viewMachine = async (req, res, next) => {
     try {
         // console.log(req.params)
-        let { id, file } = req.params;
+        let { _id } = req.params;// Document ID
+        const machine = await Machine.findOne({ _id: _id });// Get Customer id and Document Source from DB
+        let id = machine.customer.id, file = machine.document.source;
+
         let filedata = await readXML(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file}`));
         let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file.split('.')[0]}.json`));
         chain = chain.chain;
@@ -162,7 +165,7 @@ exports.viewMachine = async (req, res, next) => {
         // console.log(resultChain)
 
         return res.status(200).json({
-            success: true,
+            success: (resultBlock && resultChain ? true : false),
             data: {
                 chain: {
                     result: resultChain,

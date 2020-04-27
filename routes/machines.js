@@ -13,11 +13,11 @@ router
     .delete(deleteMachine);
 
 router
-    .route('/download/:id/:file')
+    .route('/download/:id')
     .get(downloadMachine);
 
 router
-    .route('/view/:id/:file')
+    .route('/view/:_id')
     .get(viewMachine);
 
 module.exports = router;
