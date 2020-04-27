@@ -29,6 +29,28 @@ exports.getMachines = async (req, res, next) => {
     }
 }
 
+//  @desc   Get machines ordered by customer
+//  @route  GET /api/v1/machines/customer
+//  @access Public
+exports.getCustomerMachines = async (req, res, next) => {
+    try {
+        let { _id } = req.user;// Document ID
+        const machines = await Machine.find({ 'customer.id': `${_id}` });
+
+        return res.status(200).json({
+            success: true,
+            count: machines.length,
+            data: machines
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        });
+    }
+}
+
 //  @desc   Add machine
 //  @route  POST /api/v1/machines
 //  @access Public
