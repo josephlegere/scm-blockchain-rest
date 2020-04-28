@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
         max: 1024,
         min: 6
     },
+    type: {
+        type: String,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now //no required needed

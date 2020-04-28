@@ -1,27 +1,13 @@
 const mongoose = require('mongoose');
 
-const MachineSchema = new mongoose.Schema({
-    machine_item: {
-        type: String,
-        trim: true,
+const MachinePartsSchema = new mongoose.Schema({
+    machine: {
+        type: mongoose.Types.ObjectId,
         required: true
     },
-    quantity: {
+    amount: {
         type: Number,
         required: true
-    },
-    notes: {
-        type: String
-    },
-    customer: {
-        id: {
-            type: mongoose.Types.ObjectId,
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        }
     },
     document: {
         name: {
@@ -30,11 +16,6 @@ const MachineSchema = new mongoose.Schema({
         source: {
             type: String,
             required: true
-        }
-    },
-    design: {
-        design_item: {
-            type: String
         }
     },
     parts: {
@@ -48,10 +29,24 @@ const MachineSchema = new mongoose.Schema({
             type: String
         }
     },
+    supplier: {
+        type: String,
+        required: true
+    },
+    employee: {
+        id: {
+            type: mongoose.Types.ObjectId,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        }
+    },
     createdAt: {
         type: Date,
         default: Date.now //no required needed
     }
 });
 
-module.exports = mongoose.model('Machine', MachineSchema);
+module.exports = mongoose.model('MachineParts', MachinePartsSchema);

@@ -1,19 +1,27 @@
 const mongoose = require('mongoose');
 
 const MachineSchema = new mongoose.Schema({
-    machine_item: {
-        type: String,
-        trim: true,
+    package: {
+        type: mongoose.Types.ObjectId,
         required: true
     },
-    quantity: {
+    package_type: {
+        type: mongoose.Types.ObjectId,
+        required: true
+    },
+    weight: {
         type: Number,
         required: true
     },
-    notes: {
-        type: String
+    schedule: {
+        type: String,
+        required: true
     },
-    customer: {
+    location: {
+        type: String,
+        required: true
+    },
+    sender: {
         id: {
             type: mongoose.Types.ObjectId,
             required: true
@@ -23,6 +31,19 @@ const MachineSchema = new mongoose.Schema({
             required: true
         }
     },
+    receiver: {
+        id: {
+            type: mongoose.Types.ObjectId,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        }
+    },
+    notes: {
+        type: String
+    },
     document: {
         name: {
             type: String
@@ -30,22 +51,6 @@ const MachineSchema = new mongoose.Schema({
         source: {
             type: String,
             required: true
-        }
-    },
-    design: {
-        design_item: {
-            type: String
-        }
-    },
-    parts: {
-        type: Array
-    },
-    delivery: {
-        schedule: {
-            type: String
-        },
-        location: {
-            type: String
         }
     },
     createdAt: {
