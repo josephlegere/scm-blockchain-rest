@@ -33,18 +33,26 @@ const MachineSchema = new mongoose.Schema({
         }
     },
     design: {
-        design_item: {
+        status: {
             type: String
         }
     },
     parts: {
-        type: Array
+        status: {
+            type: String
+        },
+        items: {
+            type: Array
+        }
     },
     delivery: {
         schedule: {
             type: String
         },
         location: {
+            type: String
+        },
+        status: {
             type: String
         }
     },

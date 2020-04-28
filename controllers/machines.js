@@ -65,7 +65,7 @@ exports.addMachine = async (req, res, next) => {
         let _document = { machine: {} };
         let filename = `${Date.now()}_machine`;
         let filesource = `public/uploads/${_id}/`;
-        let _temp = {};// temp sotring of records
+        let _temp = {};// temp sorting of records
         let _document_info = {};// stores the returned info of xml file
         let blockchain_container = [];// <-- THIS INITIALIZE THE BLOCKCHAIN
 
@@ -78,10 +78,7 @@ exports.addMachine = async (req, res, next) => {
         //additional information for the machine(prototype) that is being built
         _record.document = { source: _document_info.source };
         _record.customer.id = _id;
-        _record.design = {};
-        _record.parts = [];
-        _record.delivery = {};
-        console.log(_record)
+        console.log(_record);
 
         //secure data with blockchain
         console.log('Securing Data.....');

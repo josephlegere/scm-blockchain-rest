@@ -29,11 +29,7 @@ const MachinePartsSchema = new mongoose.Schema({
             type: String
         }
     },
-    supplier: {
-        type: String,
-        required: true
-    },
-    employee: {
+    manufacturer: {
         id: {
             type: mongoose.Types.ObjectId,
             required: true

@@ -29,7 +29,7 @@ const DesignSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    designer: {
+    manufacturer: {
         id: {
             type: mongoose.Types.ObjectId,
             required: true

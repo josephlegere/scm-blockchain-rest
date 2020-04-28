@@ -8,6 +8,7 @@ const connectDB = require('./config/db');
 
 const machines = require('./routes/machines');
 const auth = require('./routes/auth');
+const designs = require('./routes/designs');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -20,6 +21,7 @@ app.use(cors());
 app.use('/public', express.static(Path.join(Path.dirname(__dirname), 'scm_service_2/public'))); // for public access, refer to this directory
 app.use('/api/v1/machines', machines);
 app.use('/api/v1/user', auth);
+app.use('/api/v1/designs', designs);
 
 //PORT ENVIRONMENT VARIABLE
 const port = process.env.PORT || 5000;
