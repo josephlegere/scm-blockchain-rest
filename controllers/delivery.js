@@ -2,6 +2,7 @@ const Design = require('../models/Design');
 const User = require('../models/User');
 const Machine = require('../models/Machine');
 const Parts = require('../models/MachineParts');
+const Delivery = require('../models/Delivery');
 
 const { createXML, readXML } = require('../utils/xmlhandler');
 const { createJSON, readJSON } = require('../utils/jsonhandler');
@@ -10,23 +11,23 @@ const blockchain = require('../utils/blockchain');
 const _ = require('lodash');
 const Path = require('path');
 
-//  @desc   Get all parts
-//  @route  GET /api/v1/parts
+//  @desc   Get all deliveries
+//  @route  GET /api/v1/deliveries
 //  @access Public
-exports.getParts = async (req, res, next) => {
+exports.getDeliveries = async (req, res, next) => {
 }
 
-//  @desc   Add a machinePart
-//  @route  POST /api/v1/parts
+//  @desc   Add a delivery
+//  @route  POST /api/v1/deliveries
 //  @access Public
-exports.addParts = async (req, res, next) => {
+exports.addDelivery = async (req, res, next) => {
     try {
         console.log(req.body)
 
-        const parts = req.body;
+        const delivery = req.body;
         const { _id, iat } = req.user;
         const manufacturer = await User.findOne({ _id: _id });
-        const design = await Design.findOne({ machine: parts.machine });
+        const design = await Design.findOne({ machine: delivery.machine });
 
         let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${design.manufacturer.id}/${design.document.split('.')[0]}.json`));
         let blockchain_container = chain.chain;
@@ -37,9 +38,9 @@ exports.addParts = async (req, res, next) => {
             });
         }
 
-        let _record = _.cloneDeep(parts);
-        let _document = { parts: {} };
-        let filename = `${Date.now()}_parts`;
+        let _record = _.cloneDeep(delivery);
+        let _document = { delivery: {} };
+        let filename = `${Date.now()}_delivery`;
         let filesource = `public/uploads/${manufacturer._id}/`;
         let _temp = {};// temp sorting of records
         let _document_info = {};// stores the returned info of xml file
@@ -47,13 +48,10 @@ exports.addParts = async (req, res, next) => {
         //building of xml file with the information
         _record.manufacturer = { name: manufacturer.name };
         _temp = _.cloneDeep(_record);
-        let _temp_parts = {};
-        _temp.parts.forEach((elem, key) => { _temp_parts[`part${key + 1}`] = elem; });
-        _temp.parts = _temp_parts;
-        _document.parts = Object.assign(_document.parts, _temp);
+        _document.delivery = Object.assign(_document.delivery, _temp);
         _document_info = createXML(_document, filename, filesource);
 
-        //additional information for the parts
+        //additional information for the delivery
         _record.document = _document_info.source;
         _record.manufacturer.id = _id;
         console.log(_record);
@@ -68,17 +66,17 @@ exports.addParts = async (req, res, next) => {
         _document_info = createJSON(chainCoin, filename, filesource);
         console.log('Data Secured!');
 
-        const parts_record = await Parts.create(_record);
-        //console.log(parts_record)
-        console.log('Parts Requested!');
+        const delivery_record = await Delivery.create(_record);
+        //console.log(delivery_record)
+        console.log('Delivery Requested!');
 
-        // Then update the machine that parts has been requested
-        let machine_updated = await Machine.updateOne({ _id: parts.machine }, { parts: { id: parts_record._id, status: 'pending' } });
+        // Then update the machine that delivery has been requested
+        let machine_updated = await Machine.updateOne({ _id: delivery.machine }, { delivery: { id: delivery_record._id, status: 'pending' } });
         console.log('Machine record was updated!')
 
         return res.status(201).json({
             success: true,
-            data: parts_record
+            data: delivery_record
         });
     } catch (err) {
         if (err.name === 'ValidationError') {
@@ -99,15 +97,15 @@ exports.addParts = async (req, res, next) => {
     }
 }
 
-// @desc    View parts
-// @route   VIEW /api/v1/parts/view/:id
+// @desc    View deliveries
+// @route   VIEW /api/v1/deliveries/view/:id
 // @access  Public
-exports.viewParts = async (req, res, next) => {
+exports.viewDelivery = async (req, res, next) => {
     try {
         console.log(req.params)
         let { _id } = req.params;// Document ID
-        const parts = await Parts.findOne({ _id: _id });// Get Manufacturer id and Document Source from DB
-        let id = parts.manufacturer.id, file = parts.document;
+        const deliveries = await Delivery.findOne({ _id: _id });// Get Manufacturer id and Document Source from DB
+        let id = deliveries.manufacturer.id, file = deliveries.document;
 
         let filedata = await readXML(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file}`));
         let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file.split('.')[0]}.json`));
