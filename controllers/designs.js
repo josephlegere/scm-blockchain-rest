@@ -69,6 +69,14 @@ exports.addDesign = async (req, res, next) => {
         _record.manufacturer.id = _id;
         console.log(_record);
 
+        const design_record = await Design.create(_record);
+        //console.log(design_record)
+        console.log('Design Requested!');
+
+        // Then update the machine that design has been requested
+        let machine_updated = await Machine.updateOne({ _id: design.machine }, { design: { id: design_record._id, status: 'pending' } });
+        console.log('Machine record was updated!')
+
         //secure data with blockchain
         console.log('Securing Data.....');
         let chainCoin = await new blockchain();
@@ -78,14 +86,6 @@ exports.addDesign = async (req, res, next) => {
         console.log('Storing Blockchain.....');
         _document_info = createJSON(chainCoin, filename, filesource);
         console.log('Data Secured!');
-
-        const design_record = await Design.create(_record);
-        //console.log(design_record)
-        console.log('Design Requested!');
-
-        // Then update the machine that design has been requested
-        let machine_updated = await Machine.updateOne({ _id: design.machine }, { design: { id: design_record._id , status: 'pending' }});
-        console.log('Machine record was updated!')
 
         return res.status(201).json({
             success: true,

@@ -14,6 +14,21 @@ const Path = require('path');
 //  @route  GET /api/v1/parts
 //  @access Public
 exports.getParts = async (req, res, next) => {
+    try {
+        const parts = await Parts.find();
+
+        return res.status(200).json({
+            success: true,
+            count: parts.length,
+            data: parts
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        });
+    }
 }
 
 //  @desc   Add a machinePart
@@ -56,6 +71,7 @@ exports.addParts = async (req, res, next) => {
         //additional information for the parts
         _record.document = _document_info.source;
         _record.manufacturer.id = _id;
+        _record.delivery = { schedule: _record.schedule, location: _record.location };
         console.log(_record);
 
         //secure data with blockchain
@@ -146,6 +162,60 @@ exports.viewParts = async (req, res, next) => {
         return res.status(500).json({
             success: false,
             error: 'Server Error'
+        });
+    }
+}
+
+// @desc    Update design
+// @route   PUT /api/v1/designs
+// @access  Public
+exports.updateParts = async (req, res, next) => {
+    try {
+        const { id, machine, document, manufacturer, delivery } = req.body;
+        console.log(req.body)
+        const { _id, iat } = req.user;
+        // const parts = await Parts.find();
+
+        let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${manufacturer.id}/${document.split('.')[0]}.json`));
+        let blockchain_container = chain.chain;
+        if (blockchain_container.length !== 4) { //validate if chain is on track
+            return res.status(400).json({
+                success: false,
+                error: 'This request has been denied!'
+            });
+        }
+
+        let _document = { invoice: {} };
+        let filename = `${Date.now()}_parts_invoice`;
+        let filesource = `public/uploads/${_id}/`;
+        let _document_info = {};// stores the returned info of xml file
+
+        //building of xml file with the information
+        _document_info = createXML(_document, filename, filesource);
+
+        //let parts_updated = await Parts.updateOne({ _id: id }, { invoice: { document: _document_info.source, createdAt: Date() } });
+        let machine_updated = await Machine.updateOne({ _id: machine }, { parts: { id: id, status: 'accepted', document: _document_info.source, createdAt: Date() }, delivery: { schedule: delivery.schedule, location: delivery.location, status: 'pending' } });
+
+        //secure data with blockchain
+        console.log('Securing Data.....');
+        let chainCoin = new blockchain();
+        chainCoin.restructChain(blockchain_container);
+        chainCoin.addBlock(_document_info.data);
+        console.log(chainCoin);
+        console.log('Storing Blockchain.....');
+        _document_info = createJSON(chainCoin, filename, filesource);
+        console.log('Data Secured!');
+
+        return res.status(200).json({
+            success: true,
+            //count: parts.length,
+            data: _document_info.source
+        });
+    }
+    catch (err) {
+        return res.status(400).json({
+            success: false,
+            error: err
         });
     }
 }

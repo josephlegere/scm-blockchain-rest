@@ -34,8 +34,7 @@ const MachineSchema = new mongoose.Schema({
     },
     design: {
         id: {
-            type: mongoose.Types.ObjectId,
-            required: true
+            type: mongoose.Types.ObjectId
         },
         status: {
             type: String
@@ -50,21 +49,23 @@ const MachineSchema = new mongoose.Schema({
     },
     parts: {
         id: {
-            type: mongoose.Types.ObjectId,
-            required: true
+            type: mongoose.Types.ObjectId
         },
         status: {
             type: String
         },
         items: {
             type: Array
+        },
+        document: {
+            type: String
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now //no required needed
         }
     },
     delivery: {
-        id: {
-            type: mongoose.Types.ObjectId,
-            required: true
-        },
         schedule: {
             type: String
         },

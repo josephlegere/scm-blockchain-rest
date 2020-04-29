@@ -80,6 +80,9 @@ exports.addMachine = async (req, res, next) => {
         _record.customer.id = _id;
         console.log(_record);
 
+        const machine = await Machine.create(_record);
+        console.log('Machine Ordered!');
+
         //secure data with blockchain
         console.log('Securing Data.....');
         let chainCoin = await new blockchain();
@@ -89,9 +92,6 @@ exports.addMachine = async (req, res, next) => {
         console.log('Storing Blockchain.....');
         _document_info = createJSON(chainCoin, filename, filesource);
         console.log('Data Secured!');
-
-        const machine = await Machine.create(_record);
-        console.log('Machine Ordered!');
 
         return res.status(201).json({
             success: true,
