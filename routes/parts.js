@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const verify = require('./verifyToken');
-const { getDesigns, addDesign, viewDesign } = require('../controllers/designs');
+const cors = require('cors');
+const { getParts, addParts, viewParts } = require('../controllers/parts');
 
 router
     .route('/')
-    .get(verify, getDesigns)
-    .post(verify, addDesign);
+    .get(verify, getParts)
+    .post(verify, addParts);
 
 router
     .route('/view/:_id')
-    .get(viewDesign);
+    .get(viewParts);
 
 module.exports = router;

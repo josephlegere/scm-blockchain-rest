@@ -10,13 +10,8 @@ const MachinePartsSchema = new mongoose.Schema({
         required: true
     },
     document: {
-        name: {
-            type: String
-        },
-        source: {
-            type: String,
-            required: true
-        }
+        type: String,
+        required: true
     },
     parts: {
         type: Array

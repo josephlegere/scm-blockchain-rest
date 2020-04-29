@@ -45,13 +45,8 @@ const MachineSchema = new mongoose.Schema({
         type: String
     },
     document: {
-        name: {
-            type: String
-        },
-        source: {
-            type: String,
-            required: true
-        }
+        type: String,
+        required: true
     },
     createdAt: {
         type: Date,
