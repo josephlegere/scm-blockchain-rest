@@ -33,11 +33,19 @@ const MachineSchema = new mongoose.Schema({
         }
     },
     design: {
+        id: {
+            type: mongoose.Types.ObjectId,
+            required: true
+        },
         status: {
             type: String
         }
     },
     parts: {
+        id: {
+            type: mongoose.Types.ObjectId,
+            required: true
+        },
         status: {
             type: String
         },
@@ -46,6 +54,10 @@ const MachineSchema = new mongoose.Schema({
         }
     },
     delivery: {
+        id: {
+            type: mongoose.Types.ObjectId,
+            required: true
+        },
         schedule: {
             type: String
         },

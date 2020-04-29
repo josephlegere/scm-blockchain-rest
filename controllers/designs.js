@@ -65,10 +65,11 @@ exports.addDesign = async (req, res, next) => {
         console.log('Data Secured!');
 
         const design_record = await Design.create(_record);
+        //console.log(design_record)
         console.log('Design Requested!');
 
         // Then update the machine that design has been requested
-        let machine_updated = await Machine.updateOne({ _id: design.machine }, { design: { status: 'pending' }});
+        let machine_updated = await Machine.updateOne({ _id: design.machine }, { design: { id: design_record._id , status: 'pending' }});
         console.log('Machine record was updated!')
 
         return res.status(201).json({
@@ -98,4 +99,49 @@ exports.addDesign = async (req, res, next) => {
 // @route   VIEW /api/v1/designs/view/:id
 // @access  Public
 exports.viewDesign = async (req, res, next) => {
+    try {
+        console.log(req.params)
+        let { _id } = req.params;// Document ID
+        const design = await Design.findOne({ _id: _id });// Get Manufacturer id and Document Source from DB
+        let id = design.manufacturer.id, file = design.document;
+
+        let filedata = await readXML(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file}`));
+        let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${id}/${file.split('.')[0]}.json`));
+        chain = chain.chain;
+        console.log(filedata)
+        console.log(chain)
+
+        //validate file before sending
+        let chainCoin = await new blockchain();
+        chainCoin.restructChain(chain);
+        let resultBlock = chainCoin.blockIsValid(filedata);
+        let resultChain = chainCoin.chainIsValid();
+
+        // console.log(resultBlock)
+        // console.log(resultChain)
+
+        return res.status(200).json({
+            success: (resultBlock && resultChain ? true : false),
+            data: {
+                chain: {
+                    result: resultChain,
+                    comment: (resultChain ? 'Chain is Valid.' : 'Chain has been tampered.')
+                },
+                document: {
+                    result: resultBlock,
+                    comment: (resultBlock ? 'Document is Valid.' : 'Document has been tampered.')
+                },
+                url: {
+                    data: (resultBlock && resultChain ? `http://localhost:5000/public/uploads/${id}/${file}` : null),
+                    comment: (resultBlock && resultChain ? 'Access Granted' : 'Unauthorized File, not accessible!')
+                }
+            }
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        });
+    }
 }
