@@ -39,6 +39,13 @@ const MachineSchema = new mongoose.Schema({
         },
         status: {
             type: String
+        },
+        document: {
+            type: String
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now //no required needed
         }
     },
     parts: {

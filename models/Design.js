@@ -29,6 +29,15 @@ const DesignSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    quote: {
+        document: {
+            type: String
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now //no required needed
+        }
+    },
     manufacturer: {
         id: {
             type: mongoose.Types.ObjectId,

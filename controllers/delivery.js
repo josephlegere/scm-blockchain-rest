@@ -31,7 +31,7 @@ exports.addDelivery = async (req, res, next) => {
 
         let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${design.manufacturer.id}/${design.document.split('.')[0]}.json`));
         let blockchain_container = chain.chain;
-        if (!blockchain_container.length === 1) { //validate if chain is on track
+        if (blockchain_container.length !== 5) { //validate if chain is on track
             return res.status(400).json({
                 success: false,
                 error: 'This request has been denied!'

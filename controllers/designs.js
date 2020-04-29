@@ -13,6 +13,21 @@ const Path = require('path');
 //  @route  GET /api/v1/designs
 //  @access Public
 exports.getDesigns = async (req, res, next) => {
+    try {
+        const designs = await Design.find();
+
+        return res.status(200).json({
+            success: true,
+            count: designs.length,
+            data: designs
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        });
+    }
 }
 
 //  @desc   Add design
@@ -29,7 +44,7 @@ exports.addDesign = async (req, res, next) => {
 
         let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${machine.customer.id}/${machine.document.source.split('.')[0]}.json`));
         let blockchain_container = chain.chain;
-        if (!blockchain_container.length === 1) { //validate if chain is on track
+        if (blockchain_container.length !== 1) { //validate if chain is on track
             return res.status(400).json({
                 success: false,
                 error: 'This request has been denied!'
@@ -142,6 +157,60 @@ exports.viewDesign = async (req, res, next) => {
         return res.status(500).json({
             success: false,
             error: 'Server Error'
+        });
+    }
+}
+
+// @desc    Update design
+// @route   PUT /api/v1/designs
+// @access  Public
+exports.updateDesigns = async (req, res, next) => {
+    try {
+        const { id, machine, document, manufacturer } = req.body;
+        console.log(req.body)
+        const { _id, iat } = req.user;
+        // const designs = await Design.find();
+
+        let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${manufacturer.id}/${document.split('.')[0]}.json`));
+        let blockchain_container = chain.chain;
+        if (blockchain_container.length !== 2) { //validate if chain is on track
+            return res.status(400).json({
+                success: false,
+                error: 'This request has been denied!'
+            });
+        }
+
+        let _document = { quote: {} };
+        let filename = `${Date.now()}_design_quote`;
+        let filesource = `public/uploads/${_id}/`;
+        let _document_info = {};// stores the returned info of xml file
+
+        //building of xml file with the information
+        _document_info = createXML(_document, filename, filesource);
+
+        //let design_updated = await Design.updateOne({ _id: id }, { quote: { document: _document_info.source, createdAt: Date() } });
+        let machine_updated = await Machine.updateOne({ _id: machine }, { design: { id: id, status: 'accepted', document: _document_info.source, createdAt: Date() } });
+
+        //secure data with blockchain
+        console.log('Securing Data.....');
+        let chainCoin = new blockchain();
+        chainCoin.restructChain(blockchain_container);
+        chainCoin.addBlock(_document_info.data);
+        console.log(chainCoin);
+        console.log('Storing Blockchain.....');
+        _document_info = createJSON(chainCoin, filename, filesource);
+        console.log('Data Secured!');
+
+        return res.status(200).json({
+            success: true,
+            //count: designs.length,
+            data: _document_info.source
+        });
+    }
+    catch (err) {
+        return res.status(400).json({
+            success: false,
+            error: err
         });
     }
 }

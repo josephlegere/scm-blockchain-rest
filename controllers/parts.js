@@ -26,11 +26,11 @@ exports.addParts = async (req, res, next) => {
         const parts = req.body;
         const { _id, iat } = req.user;
         const manufacturer = await User.findOne({ _id: _id });
-        const design = await Design.findOne({ machine: parts.machine });
+        const machine = await Machine.findOne({ _id: parts.machine });
 
-        let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${design.manufacturer.id}/${design.document.split('.')[0]}.json`));
+        let chain = await readJSON(Path.resolve(Path.dirname(__dirname), 'public/uploads/', `${manufacturer._id}/${machine.design.document.split('.')[0]}.json`));
         let blockchain_container = chain.chain;
-        if (!blockchain_container.length === 1) { //validate if chain is on track
+        if (blockchain_container.length !== 3) { //validate if chain is on track
             return res.status(400).json({
                 success: false,
                 error: 'This request has been denied!'
